@@ -23,6 +23,16 @@ app.use('/', limiter);
 // Set various http headers for security:
 app.use(helmet());
 
+//This is needed for the deployment in render.com and the frontend:
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header(
+    'Access-Control-Allow-Headers',
+    'Origin, X-Requested-With, Content-Type, Accept',
+  );
+  next();
+});
+
 //We only have one route for a get request:
 app.get('/advertisers', advController.getAdvertisers);
 

@@ -28,5 +28,6 @@
     "eslint-react": "^0.0.4",
     "nodemon": "^3.0.1",
     "prettier": "^3.1.0"
-  }
+  },
+  "proxy": "https://ads-txt-crawler-backend.onrender.com"
 }
