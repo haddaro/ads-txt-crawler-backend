@@ -34,5 +34,6 @@ exports.getAdvertisers = catchAsync(async (req, res, next) => {
       delete advertiserCount[key];
     }
   });
+  //Return a response to our client:
   res.status(200).json({ status: 'success', data: advertisers });
 });
