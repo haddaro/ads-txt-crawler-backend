@@ -25,6 +25,7 @@ exports.getAdvertisers = catchAsync(async (req, res, next) => {
     return next(new AppError('Did not receive a domain', 400));
   //Allow the user to type either msn.com or www.msn.com or https://www.msn.com"
   const domain = getDomainName(req.query.domain);
+  const startTime = Date.now();
   //Look for key in cache:
   let advertisers = cache.get(domain);
   if (!advertisers) {
@@ -44,5 +45,9 @@ exports.getAdvertisers = catchAsync(async (req, res, next) => {
     cache.set(domain, advertisers, TTL);
   }
   //Return a response to our client:
-  res.status(200).json({ status: 'success', data: advertisers });
+  res.status(200).json({
+    status: 'success',
+    data: advertisers,
+    duration: Date.now() - startTime,
+  });
 });
