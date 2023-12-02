@@ -1,9 +1,12 @@
 // This controller handles a GET request with a query value which is a domain.
-
+const NodeCache = require('node-cache');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/AppError');
 const parse = require('../utils/parseAdTxt');
 const fetchText = require('../utils/fetchText');
+
+const TTL = 1000;
+const cache = new NodeCache();
 
 const getDomainName = (input) => {
   if (input.includes('www')) return input.split('.', 2)[1];
@@ -22,18 +25,24 @@ exports.getAdvertisers = catchAsync(async (req, res, next) => {
     return next(new AppError('Did not receive a domain', 400));
   //Allow the user to type either msn.com or www.msn.com or https://www.msn.com"
   const domain = getDomainName(req.query.domain);
-  //Read the text from the domain's /ad.txt endpoint:
-  const adsTxt = await fetchText(domain);
-  //Parse the text to get the advertisers and their number:
-  const advertisers = parse(adsTxt);
-  if (!advertisers)
-    return next(new AppError('Could not retrieve advertisers', 500));
-  //We have our own domain in the returned object, lets get rid of it:
-  Object.keys(advertiserCount).forEach((key) => {
-    if (key === domain) {
-      delete advertiserCount[key];
-    }
-  });
+  //Look for key in cache:
+  let advertisers = cache.get(domain);
+  if (!advertisers) {
+    //Read the text from the domain's /ad.txt endpoint:
+    const adsTxt = await fetchText(domain);
+    //Parse the text to get the advertisers and their number:
+    advertisers = parse(adsTxt);
+    if (!advertisers)
+      return next(new AppError('Could not retrieve advertisers', 500));
+    //We have our own domain in the returned object, lets get rid of it:
+    Object.keys(advertiserCount).forEach((key) => {
+      if (key === domain) {
+        delete advertiserCount[key];
+      }
+    });
+    //now cache the result:
+    cache.set(domain, advertisers, TTL);
+  }
   //Return a response to our client:
   res.status(200).json({ status: 'success', data: advertisers });
 });
