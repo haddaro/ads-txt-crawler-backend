@@ -9,8 +9,13 @@ const TTL = 1000;
 const cache = new NodeCache();
 
 const getDomainName = (input) => {
-  if (input.includes('www')) return input.split('.', 2)[1];
-  return input;
+  //Remove protocol if present, either http:// or https://
+  let domainName = input.replace(/^https?:\/\//, '');
+  //Remove www. if present:
+  domainName = domainName.replace(/^www\./, '');
+  //Remove unnecessary endpoint, if present after our domain, and take just teh domain:
+  domainName = domainName.split('/', 2)[0];
+  return domainName;
 };
 
 /* This function returns an object whose keys are the advertisers allowed to display
