@@ -19,9 +19,8 @@ const countInstances = (array) => {
   return res;
 };
 
-/*Since some of the matches with the urlPattern are something like this:
-11.13.23
-We want to make sure that we do not include them in the urls array.
+/*Since some of the matches with the urlPattern are dates rather than urls,
+we want to make sure that we do not include them in the urls array.
 */
 const hasLetters = (word) => {
   return /[a-zA-Z]/.test(word);
@@ -32,7 +31,7 @@ const parse = (rawText) => {
   words = rawText.split(' ');
   //Filter for only words that include urls:
   relevantWords = words.filter((word) => {
-    return urlPattern.test(word) && hasLetters(word) && !word.includes('.txt');
+    return urlPattern.test(word) && !word.includes('.txt');
   });
   /*Now we have an array of words that look like this:
   "#display\r\nappnexus.com," which is still not good.
@@ -46,16 +45,14 @@ const parse = (rawText) => {
   urls = urlsPlus.map((url) => url.split(',', 2)[0]);
   //Now we have an array of urls that we need to count:
   advertiserCount = countInstances(urls);
-  /* Could not get rid of dates ("11.13.23") which the RegEx thought are urls
-    in the first "filter", so lets get rid of them now when we have less strings to iterate:
-  */
+  // Get rid of them now when we have less strings to iterate:
   Object.keys(advertiserCount).forEach((key) => {
     if (!hasLetters(key)) {
       delete advertiserCount[key];
     }
   });
   return advertiserCount;
-  //Small problem: our own domain is in the object! We'll deal with this in the controller.
+  //Small problem: our own domain is in the object. We'll deal with this in the controller.
 };
 
 module.exports = parse;

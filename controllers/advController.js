@@ -13,13 +13,13 @@ const getDomainName = (input) => {
   let domainName = input.replace(/^https?:\/\//, '');
   //Remove www. if present:
   domainName = domainName.replace(/^www\./, '');
-  //Remove unnecessary endpoint, if present after our domain, and take just teh domain:
+  //Remove unnecessary endpoint, if present after our domain, and take just the domain:
   domainName = domainName.split('/', 2)[0];
   return domainName;
 };
 
 /* This function returns an object whose keys are the advertisers allowed to display
-adds in the query domain, and values are the number of times they appear in the ad.txt file.
+adds in the query domain, and values are the number of times they appear in the ads.txt file.
 It is wrapped by our "catchAsync" function that handles exceptions,
 so we don't have to try-catch everything.
 A call to next() with an error will go to the error-handling middleware, 
@@ -34,7 +34,7 @@ exports.getAdvertisers = catchAsync(async (req, res, next) => {
   //Look for key in cache:
   let advertisers = cache.get(domain);
   if (!advertisers) {
-    //Read the text from the domain's /ad.txt endpoint:
+    //Read the text from the domain's /ads.txt endpoint:
     const adsTxt = await fetchText(domain);
     //Parse the text to get the advertisers and their number:
     advertisers = parse(adsTxt);

@@ -1,4 +1,4 @@
-// Reads the text from a specified domain's /ad.txt endpoint
+// Reads the text from a specified domain's /ads.txt endpoint
 const axios = require('axios');
 const AppError = require('./AppError');
 
